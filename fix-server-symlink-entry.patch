@@ -1,0 +1,22 @@
+diff --git a/server.mjs b/server.mjs
+index ead11f1..9c32bea 100644
+--- a/server.mjs
++++ b/server.mjs
+@@ -4,6 +4,7 @@ import {
+   existsSync,
+   mkdirSync,
+   readFileSync,
++  realpathSync,
+   readdirSync,
+   writeFileSync,
+   statSync,
+@@ -2286,7 +2287,8 @@ export function createQualityServer(options = {}) {
+   return server;
+ }
+ 
+-const isDirectRun = process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
++// Node resolves module symlinks; cron launches through the release's current link.
++const isDirectRun = process.argv[1] && existsSync(process.argv[1]) && pathToFileURL(realpathSync(process.argv[1])).href === import.meta.url;
+ if (isDirectRun) {
+   const args = parseArgs(process.argv.slice(2));
+   const port = Number(args.port || process.env.PORT || 4174);
